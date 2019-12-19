@@ -1,0 +1,37 @@
+syntax = "proto2";
+package filter;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FileOptions {
+    optional ValueFilter file = 61255;
+}
+
+extend google.protobuf.ServiceOptions {
+    optional ValueFilter service = 61255;
+}
+
+extend google.protobuf.MethodOptions {
+    optional ValueFilter method = 61255;
+}
+
+extend google.protobuf.EnumOptions {
+    optional ValueFilter enum = 61255;
+}
+
+extend google.protobuf.EnumValueOptions {
+    optional ValueFilter enum_value = 61255;
+}
+
+extend google.protobuf.MessageOptions {
+    optional ValueFilter message = 61255;
+}
+
+extend google.protobuf.FieldOptions {
+    optional ValueFilter field = 61255;
+}
+
+message ValueFilter {
+    repeated string include = 1;
+    repeated string exclude = 2;
+}

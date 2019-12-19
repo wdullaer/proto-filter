@@ -1,0 +1,71 @@
+// Test to see if this is also considered a leading comment
+//
+// We are using proto3 everywhere
+syntax = "proto3"; // Comments after the syntax block
+
+package com.test;
+
+import "filter/filter.proto";
+
+option go_package = "example.protobuf.test";
+
+message Test {
+  option (filter.message) = { include:"NA"  };
+
+  string na_string = 2 [(filter.field) = { include:"NA"  }];
+
+  Empty nothing = 3;
+
+  // Life's not a game but I'm winning
+  repeated double high_scores = 6; // Insert your favourite music quote here
+
+  oneof hard_part {
+    Empty empty = 4;
+
+    EmbedMessage embed_message = 5;
+  }
+
+  message EmbedMessage {
+    int64 some_item = 1 [jstype = JS_STRING];
+
+    map<string, string> some_map = 2;
+
+    EmbedEnum awesome = 3;
+  }
+
+  enum EmbedEnum {
+    EMBED_DEFAULT = 0;
+
+    EMBED_VAL = 1;
+
+    EMBED_AWESOME = 2;
+  }
+}
+
+message Empty {
+}
+
+// I wasn't very creative when naming this
+enum MyEnum {
+  AUTOMATIC = 0;
+
+  MANUAL = 1 [deprecated = true];
+
+  // Every five minutes
+  BATCH = 2; // Who doesn't like batch?
+}
+
+// My service description
+// It has a lot going for it
+//
+// Mainly that it is not used and therefore easy to maintain
+service TestService {
+  // GetList returns a list of nothing.
+  rpc GetList ( Empty ) returns ( Empty ); // Most useful rpc in the world
+
+  rpc PutMessages ( stream Empty ) returns ( Empty );
+
+  rpc PullMessages ( Empty ) returns ( stream Empty ) {
+    option deprecated = true;
+  }
+}
