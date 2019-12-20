@@ -161,19 +161,9 @@ func filterEnumValue(enumValueBuilder *builder.EnumValueBuilder, terms *set.Set)
 		}
 	}
 
-	for _, child := range enumValueBuilder.GetChildren() {
-		if isExcluded, err := filterChild(child, terms); err != nil {
-			return false, err
-		} else if isExcluded {
-			removeEnumValueChild(enumValueBuilder, child)
-		}
-	}
+	// EnumValues cannot have children
 
 	return false, nil
-}
-
-func removeEnumValueChild(_ *builder.EnumValueBuilder, _ builder.Builder) {
-	return
 }
 
 func filterService(serviceBuilder *builder.ServiceBuilder, terms *set.Set) (bool, error) {
@@ -228,19 +218,9 @@ func filterMethod(methodBuilder *builder.MethodBuilder, terms *set.Set) (bool, e
 		}
 	}
 
-	for _, child := range methodBuilder.GetChildren() {
-		if isExcluded, err := filterChild(child, terms); err != nil {
-			return false, err
-		} else if isExcluded {
-			removeMethodChild(methodBuilder, child)
-		}
-	}
+	// Methods cannot have children
 
 	return false, nil
-}
-
-func removeMethodChild(_ *builder.MethodBuilder, _ builder.Builder) {
-	return
 }
 
 func filterField(fieldBuilder *builder.FieldBuilder, terms *set.Set) (bool, error) {
@@ -260,19 +240,9 @@ func filterField(fieldBuilder *builder.FieldBuilder, terms *set.Set) (bool, erro
 		}
 	}
 
-	for _, child := range fieldBuilder.GetChildren() {
-		if isExcluded, err := filterChild(child, terms); err != nil {
-			return false, err
-		} else if isExcluded {
-			removeFieldChild(fieldBuilder, child)
-		}
-	}
+	// Fields cannot have children
 
 	return false, nil
-}
-
-func removeFieldChild(_ *builder.FieldBuilder, _ builder.Builder) {
-	return
 }
 
 func filterOneOf(oneOfBuilder *builder.OneOfBuilder, terms *set.Set) (bool, error) {
