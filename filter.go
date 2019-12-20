@@ -7,16 +7,6 @@ import (
 	"github.com/wdullaer/proto-filter/filter"
 )
 
-const (
-	fileFilter      = "file_filter"
-	messageFilter   = "message_filter"
-	serviceFilter   = "service_filter"
-	methodFilter    = "method_filter"
-	fieldFilter     = "field_filter"
-	enumFilter      = "enum_filter"
-	enumValueFilter = "enum_value_filter"
-)
-
 // filterFile recursively applies the ValueFilter to the proto file and all its
 // contents. It will return `true` if the file is to be removed from the output
 //
@@ -138,8 +128,7 @@ func filterEnum(enumBuilder *builder.EnumBuilder, terms *set.Set) (bool, error) 
 }
 
 func removeEnumChild(enumBuilder *builder.EnumBuilder, child builder.Builder) {
-	switch c := child.(type) {
-	case *builder.EnumValueBuilder:
+	if c, ok := child.(*builder.EnumValueBuilder); ok {
 		enumBuilder.RemoveValue(c.GetName())
 	}
 }
@@ -195,8 +184,7 @@ func filterService(serviceBuilder *builder.ServiceBuilder, terms *set.Set) (bool
 }
 
 func removeServiceChild(serviceBuilder *builder.ServiceBuilder, child builder.Builder) {
-	switch c := child.(type) {
-	case *builder.MethodBuilder:
+	if c, ok := child.(*builder.MethodBuilder); ok {
 		serviceBuilder.RemoveMethod(c.GetName())
 	}
 }
@@ -274,8 +262,7 @@ func filterOneOf(oneOfBuilder *builder.OneOfBuilder, terms *set.Set) (bool, erro
 }
 
 func removeOneOfChild(oneOfBuilder *builder.OneOfBuilder, child builder.Builder) {
-	switch c := child.(type) {
-	case *builder.FieldBuilder:
+	if c, ok := child.(*builder.FieldBuilder); ok {
 		oneOfBuilder.RemoveChoice(c.GetName())
 	}
 }

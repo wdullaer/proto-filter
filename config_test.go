@@ -9,10 +9,9 @@ import (
 
 func TestConfigValidate(t *testing.T) {
 	cases := []struct {
-		name   string
-		input  *Config
-		output *Config
-		errs   []error
+		name  string
+		input *Config
+		errs  []error
 	}{
 		{
 			name:  "Should return errors with an empty input",
