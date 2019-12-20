@@ -17,32 +17,38 @@ const (
 	enumValueFilter = "enum_value_filter"
 )
 
-func filterFile(fileBuilder *builder.FileBuilder, terms *set.Set) (*builder.FileBuilder, error) {
+// filterFile recursively applies the ValueFilter to the proto file and all its
+// contents. It will return `true` if the file is to be removed from the output
+//
+// filterFile mutates the FileBuilder (and child Builders) in place: this
+// simplified the code quite a bit, since there is no convenience method to
+// remove all children from a Builder.
+func filterFile(fileBuilder *builder.FileBuilder, terms *set.Set) (bool, error) {
 	// Use the regular protobuf stuff to extract the extension value and compare
 	fDesc, err := fileBuilder.Build()
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 	if fOptions := fDesc.GetFileOptions(); fOptions != nil {
 		extVal, err := proto.GetExtension(fOptions, filter.E_File)
 		if err != proto.ErrMissingExtension {
 			if err != nil {
-				return nil, err
+				return false, err
 			}
 			if isExcluded(extVal, terms) {
-				return nil, nil
+				return true, nil
 			}
 		}
 	}
 
 	for _, child := range fileBuilder.GetChildren() {
 		if isExcluded, err := filterChild(child, terms); err != nil {
-			return nil, err
+			return false, err
 		} else if isExcluded {
 			removeFileChild(fileBuilder, child)
 		}
 	}
-	return fileBuilder, nil
+	return false, nil
 }
 
 func removeFileChild(fileBuilder *builder.FileBuilder, child builder.Builder) {
@@ -288,7 +294,11 @@ func filterChild(child builder.Builder, terms *set.Set) (bool, error) {
 	}
 }
 
+// isExcluded evaluates the filter rules based on the data in the ValueFilter
 func isExcluded(extVal interface{}, terms *set.Set) bool {
+	if terms == nil || terms.Len() == 0 {
+		return false
+	}
 	filterVal := extVal.(*filter.ValueFilter)
 	for _, item := range filterVal.GetExclude() {
 		if terms.Exists(item) {
@@ -300,5 +310,7 @@ func isExcluded(extVal interface{}, terms *set.Set) bool {
 			return false
 		}
 	}
-	return true
+	// If Include is empty we don't want to exclude the item by default.
+	// If Include is not empty, we should only include it if is explicitly matching
+	return len(filterVal.Include) != 0
 }

@@ -73,8 +73,8 @@ func action(c *cli.Context) error {
 		}
 		if result, err := filterFile(fileBuilder, config.Terms); err != nil {
 			return err
-		} else if result != nil {
-			fDesc, err := result.Build()
+		} else if result {
+			fDesc, err := fileBuilder.Build()
 			if err != nil {
 				return err
 			}
@@ -87,6 +87,7 @@ func action(c *cli.Context) error {
 	return printer.PrintProtosToFileSystem(output, config.Output)
 }
 
+// makeStringSet is a convenience wrapper which produces a new Set from a slice of strings
 func makeStringSet(items []string) *set.Set {
 	ifaceSlice := make([]interface{}, len(items))
 	for i := range items {
