@@ -31,6 +31,10 @@ extend google.protobuf.FieldOptions {
     optional ValueFilter field = 61255;
 }
 
+extend google.protobuf.OneofOptions {
+    optional ValueFilter one_of = 61255;
+}
+
 message ValueFilter {
     repeated string include = 1;
     repeated string exclude = 2;

@@ -275,6 +275,41 @@ func removeFieldChild(_ *builder.FieldBuilder, _ builder.Builder) {
 	return
 }
 
+func filterOneOf(oneOfBuilder *builder.OneOfBuilder, terms *set.Set) (bool, error) {
+	oDesc, err := oneOfBuilder.Build()
+	if err != nil {
+		return false, err
+	}
+	if oOptions := oDesc.GetOneOfOptions(); oOptions != nil {
+		extVal, err := proto.GetExtension(oOptions, filter.E_OneOf)
+		if err != proto.ErrMissingExtension {
+			if err != nil {
+				return false, err
+			}
+			if isExcluded(extVal, terms) {
+				return true, nil
+			}
+		}
+	}
+
+	for _, child := range oneOfBuilder.GetChildren() {
+		if isExcluded, err := filterChild(child, terms); err != nil {
+			return false, err
+		} else if isExcluded {
+			removeOneOfChild(oneOfBuilder, child)
+		}
+	}
+
+	return false, nil
+}
+
+func removeOneOfChild(oneOfBuilder *builder.OneOfBuilder, child builder.Builder) {
+	switch c := child.(type) {
+	case *builder.FieldBuilder:
+		oneOfBuilder.RemoveChoice(c.GetName())
+	}
+}
+
 func filterChild(child builder.Builder, terms *set.Set) (bool, error) {
 	switch c := child.(type) {
 	case *builder.MessageBuilder:
@@ -289,6 +324,8 @@ func filterChild(child builder.Builder, terms *set.Set) (bool, error) {
 		return filterMethod(c, terms)
 	case *builder.EnumValueBuilder:
 		return filterEnumValue(c, terms)
+	case *builder.OneOfBuilder:
+		return filterOneOf(c, terms)
 	default:
 		return false, nil
 	}
